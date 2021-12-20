@@ -443,7 +443,7 @@ $$r_{k}=\frac{\sum_{t=k+1}^{T}(y_{t}-\bar{y})(y_{t-k}-\bar{y})}{\sum_{t=1}^{T}(y
   .purple[.font3[ **Time series features**]]
   
 ```{r ,echo=FALSE, out.width = '95%', out.height = '95%',fig.height=7, fig.width=16}
-knitr::include_graphics("images/RESfea.JPG")
+knitr::include_graphics("images/resFEA.JPG")
 ```
 
 ---
