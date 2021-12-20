@@ -1,0 +1,1134 @@
+---
+title: ".center[Hierarchical Forecasting of Dengue Incidence in <br> Sri Lanka]"
+author: "<br><br>Samudra Madushani <br><br>Dr. Thiyanga S. Talagala"
+        
+date: "<br>`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["xaringan-themer.css","kunoichi", "ninjutsu" , "assets/ninpo.css"]
+    seal: true 
+    self_contained: false
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+class: bg-main1 center middle
+
+```{r echo=FALSE,warning=FALSE,message=FALSE}
+library(icons)
+library(anicon)
+anicon::faa("rocket", animate="passing", size = 3)
+
+```
+
+.font5[**Introduction**] 
+
+---
+
+class: split-two white
+
+.column.bg-main1[.content[
+<br>
+```{r ,echo=FALSE,fig.height=9,fig.width=8,out.width='97%',out.height='97%'}
+library(ggplot2)
+Year<-c(2010:2020)
+Dengue<-c(25559,21079,23792,22213,34775,23010,32695,174025,51938,92467,35397)
+df<-data.frame(Year,Dengue)
+S1<-ggplot(df, aes(x=as.factor(Year), y=Dengue, fill=Dengue)) + 
+  geom_bar(stat = "identity", color="#1f78b4", fill="#1f78b4")+       theme(legend.position = 'none')+
+  labs(x="Year", y = "Dengue counts", text = element_text(size=80))
+S1
+
+```
+]]
+.column.bg-main2[.content.vmiddle.center[
+
+![](images\F1.JPG)
+]]
+
+---
+
+class: bg-main1 center middle
+
+```{r echo=FALSE,warning=FALSE,message=FALSE}
+library(icons)
+library(anicon)
+anicon::faa("rocket", animate="passing", size = 3)
+
+```
+
+.font5[ **Objectives**] 
+
+---
+class: bg-main1 
+.font2[ .yellow[**Main objective**]]
+.font2[
+* Forecast dengue incidence in Sri Lanka using spatio-temporal hierarchical structure of dengue incidence.]
+--
+
+.font2[
+  .yellow[ **Specific objectives**]
+
+* Introduce a novel feature-based visualization approach to identify patterns associated with time series of spatio-temporal structure. 
+
+* Develop an R software package to automate the process of extracting data from weekly epidemiological PDF reports.
+
+* Identify the reasons for forecasting model performance variations.
+
+* Develop a shiny app to disseminate the research output.
+
+]
+
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW1.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW2.JPG")
+```
+
+---
+
+.font3[.purple[**Data**]]
+
+.font2[
+* Epidemiological unit, Ministry of Health, Sri Lanka
+
+  https://www.epid.gov.lk/web
+
+* Format of the table in the Epidemiological Report]
+
+```{r figurechapter03, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '80%', out.height = '20%',fig.height=3, fig.width=15}
+knitr::include_graphics("images/F3MOD.JPG")
+```
+
+---
+
+class: bg-main1 
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="100%",out.width="100%",fig.align='center'}
+knitr::include_graphics("images/PDFF.JPG")
+```
+
+---
+
+class: split-two white
+
+.column.bg-white1[.content[
+<br>
+.center[.purple[.font3[**PDF data extraction**]]]
+<br><br>
+.black[.font2[**Methods**]
+<br>
+.font2[
+* Copy and paste
+
+* Manual data entry
+
+* PDF table extraction tools]
+
+]]]
+
+.column.bg-main2[.content[
+<br><br><br><br><br><br>
+.font2[**Challenges**]
+<br>
+.font2[
+* Cause errors
+
+* Requires considerable amount of time and effort
+
+* Doesn't maintain the original format]
+
+
+]]]
+
+---
+
+class: split-two white
+
+.column.bg-white1[.content[
+<br>
+.center[.purple[.font3[**PDF data extraction**]]]
+<br><br>
+.black[.font2[**Methods**]
+<br>
+.font2[
+* Copy and paste
+
+* Manual data entry
+
+* PDF table extraction tools]
+
+### `r anicon::cia("C1.JPG", size=2, border=T, animate="bounce",speed="fast")`
+
+]]]
+
+.column.bg-main2[.content[
+<br><br><br><br><br><br>
+.font2[**Challenges**]
+<br>
+.font2[
+* Cause errors
+
+* Requires considerable amount of time and effort
+
+* Doesn't maintain the original format]
+
+
+]]]
+
+---
+
+```{r ,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+#' path <- setwd(here::here("pdffiles","2020"))
+#' startdate <- c("2019-12-21","2019-12-27","2019-12-28","2020-01-03","2020-01-04","2020-01-10","2020-01-11","2020-01-17","2020-01-18","2020-01-24","2020-01-25","2020-01-31","2020-02-01","2020-02-07","2020-02-08","2020-02-14","2020-02-15","2020-02-21","2020-02-22","2020-02-28","2020-02-29","2020-03-06","2020-03-07","2020-03-13","2020-03-14","2020-03-20","2020-03-21","2020-03-27","2020-03-28","2020-04-03","2020-04-04","2020-04-10","2020-04-11","2020-04-17","2020-04-18","2020-04-24","2020-04-25","2020-05-01","2020-05-02","2020-05-08","2020-05-09","2020-05-15","2020-05-16","2020-05-22","2020-05-23","2020-05-29","2020-05-30","2020-06-05","2020-06-06","2020-06-12","2020-06-13","2020-06-19","2020-06-20","2020-06-26","2020-06-27","2020-07-03","2020-07-04","2020-07-10","2020-07-11","2020-07-17","2020-07-18","2020-07-24","2020-07-25","2020-07-31","2020-08-01","2020-08-07","2020-08-08","2020-08-14","2020-08-15","2020-08-21","2020-08-22","2020-08-28","2020-08-29","2020-09-04","2020-09-05","2020-09-11","2020-09-12","2020-09-18","2020-09-19","2020-09-25","2020-09-26","2020-10-02","2020-10-03","2020-10-09","2020-10-10","2020-10-16","2020-10-17","2020-10-23","2020-10-24","2020-10-30","2020-10-31","2020-11-06","2020-11-07","2020-11-13","2020-11-14","2020-11-20","2020-11-21","2020-11-27","2020-11-28","2020-12-04","2020-12-05","2020-12-11","2020-12-12","2020-12-18")
+#' year <- c(2019,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020)
+#' week <- c(52,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51);
+#' Cname <- c("Division","Dengue","Dengue B","Dysentery","Dysentery B","Encephalitis",
+#'        "Encephalitis B","Enteric Fever","Enteric Fever B","Food Poisioning",
+#'        "Food Poisioning B","Leptospirosis","Leptospirosis B","Typhus Fever",
+#'        "Typhus Fever B","Viral Hepatistis","Viral Hepatistis B","Human Rabies",
+#'        "Human Rabies B","Chickenpox","Chickenpox B","Meningitis",
+#'        "Meningitis B", "Leishmaniasis","Leishmaniasis B")
+#' DeletingRows <- c(1,2,3,30,31,32,33,34)
+#' TotalColmns <- 27
+#' PercentageColmns <- c(26,27)
+#' DeleteColmns <- c(3,5,7,9,11,13,15,17,19,21,23,25)
+#' Weeks_2020 <- Reading_EpidemiologicalReports(path,startdate,year,week,Cname,DeletingRows,TotalColmns,PercentageColmns,DeleteColmns)
+```
+
+```{r ,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+Processed_Data<-function(processed_data_path)
+{
+  Disease_Counts_csv <- list.files(path = ".", pattern = NULL, all.files = FALSE,
+                                   full.names = FALSE, recursive = FALSE,
+                                   ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
+  Data_Counts <- tsibble::as_tibble (data.table::rbindlist (lapply (Disease_Counts_csv , data.table::fread),fill = T))
+  Data_Counts <- dplyr::relocate(Data_Counts, Year,Week,StartDate,EndDate,.before=Division)
+  Data_Counts <- dplyr::arrange(Data_Counts, StartDate)
+  setwd(here::here("data"))
+  save (Data_Counts, file = 'FinalData.Rda')
+  return(Data_Counts)
+}
+```
+
+
+```{r ,echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+library(tsibble)
+library(magrittr)
+library(forecast)
+library(ggplot2)
+library(tsibble)
+library(feasts)
+library(patchwork)
+library(viridisLite)
+library(viridis)
+load("data/FinalData.Rda")
+D<-Data_Counts
+D
+```
+
+<br>
+  .purple[.font3[**DISC (DISease Counts) Package**]]
+
+```{r figurechapter08, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '25%', out.height = '25%',fig.height=6, fig.width=6}
+knitr::include_graphics("images/F8.JPG")
+```
+
+```{r}
+#install.packages("remotes")
+#remotes::install_github("SMART-Research/DISC")
+```
+
+---
+
+<br>
+  .purple[.font3[**Functionalities of DISC Package**]]
+
+    
+```{r ,echo=FALSE,fig.height=6, fig.width=16, out.height="80%",out.width="97%"}
+
+knitr::include_graphics("images/FUNC1.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[**Functionalities of DISC Package**]]
+
+    
+```{r ,echo=FALSE,fig.height=6, fig.width=16, out.height="80%",out.width="97%"}
+
+knitr::include_graphics("images/FUNC2.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW3.JPG")
+```
+
+---
+```{r ,echo=FALSE}
+Week<-tsibble::yearweek(D$EndDate)
+Date<-D$EndDate
+Province<-rep(c(rep("Western",3),rep("Central",3),rep("Southern",3),rep("Nothern",5),
+                rep("Eastern",3),rep("NorthWestern",2),rep("NorthCentral",2),
+                rep("Uva",2),rep("Sabaragamuwa",2),rep("Eastern",1)),730)
+Districts<-D$Division
+Counts<-as.integer(D$Dengue)
+```
+
+
+```{r ,echo=FALSE}
+DengueTEST<-tibble(Week,Date,Counts,Districts,Province)
+DataDengueTEST<- DengueTEST%>% 
+  as_tsibble(key=c(Province,Districts),index=Week)#<<
+```
+
+class: split-two white
+
+.row.bg-main1[.content[
+<br>
+.font3[**Objectives of Data Visualization**]
+
+.font2[
+* Identify the spatio-temporal patterns associated with time series
+
+* Dengue outbreak identification
+
+* Prominent features identification]
+
+]]
+
+--
+.row.bg-main2[.content[
+
+.font3[**Data Visualization approaches**]
+
+.font2[
+*   Time domain visualization
+
+*   Feature-based visualization
+
+*   Change point analysis]
+
+]]]
+
+---
+
+<br>
+  .purple[.font3[ **Time domain visualization-Districts**]]
+
+```{r ,echo=FALSE, code=readLines("PD.R"),echo=FALSE,results='hide',message=FALSE,warning=FALSE}
+```
+
+
+```{r figurechapter09A, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '90%', out.height = '100%',fig.height=7, fig.width=14}
+knitr::include_graphics("images/DP1.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[ **Time domain visualization-Districts**]]
+
+```{r ,echo=FALSE, out.width = '90%', out.height = '40%',fig.height=5, fig.width=10, fig.align = 'center'}
+Dengue_Districts <- DataDengueTEST%>%
+  dplyr::group_by(Districts) %>%
+  dplyr::summarise(Counts = sum(Counts))
+cp<-Dengue_Districts%>%autoplot(Counts)+labs(y = "Counts",x="Week")
+cp<-cp+theme(legend.position="bottom")
+cp
+```
+
+---
+
+<br>
+  .purple[.font3[ **Time domain visualization-Districts**]]
+
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '80%',fig.height=7, fig.width=16}
+plotly::ggplotly(HM2)
+```
+
+---
+
+<br>
+  .purple[.font3[ **Min-Max Transformation**]]
+
+.font2[ 
+$$\frac{x_{i}-min(x)}{max(x)-min(x)}$$
+where $x=(x_{1},x_{2},\dots,x_{n})$.
+
+* Rescaling dengue counts of all districts onto 0-1 range.]
+
+---
+
+<br>
+  .purple[.font3[ **Time domain visualization-Districts**]]
+
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '80%',fig.height=7, fig.width=16}
+plotly::ggplotly(HMT2)
+```
+
+---
+
+<br>
+  .purple[.font3[**Feature-based visualization**]]
+
+```{r figurechapter09FB, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '90%', out.height = '80%',fig.height=6, fig.width=16}
+knitr::include_graphics("images/FES1.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[ **Time series features**]]
+.font2[
+* Feature of a time series is the numerical summary calculated from a time series.]
+
+  .purple[.font2[ Seasonal and Trend (STL) Decomposition]]
+
+```{r , echo=FALSE, fig.align = 'center',message=FALSE, out.width = '60%', out.height = '60%',fig.height=5, fig.width=10}
+knitr::include_graphics("images/STL.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[ **Time series features**]]
+  
+.font2[.purple[Strength of seasonality]]
+$$F_{s}=max\biggl(0,1-\frac{Var(R_{t})}{Var(S_{t}+R_{t})}\biggr)$$
+.font2[.purple[Strength of trend]]
+$$F_{t}=max\biggl(0,1-\frac{Var(R_{t})}{Var(T_{t}+R_{t})}\biggr)$$
+.font2[.purple[Spectral entropy] 
+* A measure of forecastability of a time series.]
+
+$$H_{s}=-\int_{-\pi}^{\pi}\hat{f}_{y}(\lambda)log\hat{f}_{y}(\lambda).d\lambda$$
+
+---
+
+.font2[
+.purple[Autocorrelation function: ACF]
+
+* Autocorrelation measures the strength of linear relationship between lagged value of a time series.]
+
+$$r_{k}=\frac{\sum_{t=k+1}^{T}(y_{t}-\bar{y})(y_{t-k}-\bar{y})}{\sum_{t=1}^{T}(y_{t}-\bar{y})^{2}}$$
+.font2[ $r_{k}$ measures the linear relationship between $y_{t}$ and $y_{t-k}$.
+
+.purple[Number of crossing points]
+
+* computes the number of times a time series crosses the median.
+]
+
+---
+
+<br>
+  .purple[.font3[ **Time series features**]]
+  
+```{r ,echo=FALSE, out.width = '95%', out.height = '95%',fig.height=7, fig.width=16}
+knitr::include_graphics("images/RESfea.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[ **Spatial Hierarchical Structure**]]
+
+```{r figurechapter0004r1, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '85%', out.height = '15%',fig.height=5, fig.width=13}
+knitr::include_graphics("images/SPST.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[ **Time series features**]]
+
+```{r ,echo=FALSE}
+SHS_DataDengueTEST<-DataDengueTEST%>%fabletools::aggregate_key(Province/Districts,Counts=sum(Counts))
+```
+
+
+```{r ,echo=FALSE,comment=NA}
+Dengue_features<-SHS_DataDengueTEST %>% features(Counts, feature_set(pkgs = "feasts"))
+Dengue_features
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/FES2.JPG")
+```
+
+---
+
+<br>
+  .purple[.font3[**Principal Component Analysis**]]
+.font2[* Principal components are new variables that are constructed as linear combinations of the initial variables.
+
+  .purple[Procedure]
+
+* Consider that $X_{1}, X_{2},\dots,X_{p}$ as time series features.
+
+* Obtain standardized time series features.]
+
+$$Z=\frac{value-mean}{s.d.}$$
+
+---
+
+.font2[
+ * .purple[Covariance matrix] $(\Sigma)$ of the vector $Z^{'}=\{Z_{1}, Z_{2},\dots,Z_{p}\}$,]
+
+$$
+\begin{pmatrix}
+Var(Z_{1}) & Cov(Z_{1},Z_{2}) & \dots & Cov(Z_{1}, Z_{p})\\
+Cov(Z_{2},Z_{1}) & Var(Z_{2}) & \dots & Cov(Z_{2}, Z_{p})\\
+. & . & \dots & .\\
+. & . & \dots & .\\
+Cov(Z_{p},Z_{1}) & Cov(Z_{p},Z_{2}) & \dots & Var(Z_{p})
+\end{pmatrix}
+$$
+
+.font2[
+.purple[ Compute Eigenvalues and Eigenvectors of covariance matrix]
+
+  * Rank the Eigenvalues in descending order $\lambda_{1} \geq \lambda_{2} \geq \lambda_{3} \geq \dots\geq\lambda_{p}\geq0$.
+  
+  * Corresponding Eigenvectors are $a_{1},a_{2},a_{3},\dots,a_{p}$]
+  
+---
+
+.font2[
+ * New set of variables (Principal components) are obtained as a linear combination of features]
+
+$$Y_{1}=a_{11}X_{1}+a_{12}X_{2}+\dots+a_{1p}X_{p}=a_{1}^{'}X\\$$
+
+```{r ,echo=FALSE,warning=FALSE,message=FALSE, out.width = '97%', out.height = '97%',fig.height=6, fig.width=16}
+library(broom)
+pr<-prcomp(Dengue_features[,-c(1,2,31,33,35,37)],scale=TRUE)
+library(factoextra)
+fviz_eig(pr)
+```
+
+---
+
+.font2[
+.purple[ **Principal Component Analysis**]]
+
+```{r ,echo=FALSE}
+as.data.frame(pr$rotation)
+```
+
+```{r ,echo=FALSE}
+pcs<-Dengue_features%>% dplyr::select(-c(1,2,31,33,35,37)) %>% prcomp(scale = TRUE) %>%
+  augment(Dengue_features)
+```
+
+---
+
+class: bg-main1 center middle
+
+```{r echo=FALSE,warning=FALSE,message=FALSE}
+library(icons)
+library(anicon)
+anicon::faa("rocket", animate="passing", size = 3)
+
+```
+
+.font5[ **Feature-based Visualization**] 
+
+---
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP1M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP2M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP3M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP4M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP5.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP6M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP7M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP8M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP9M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP10.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP11M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP12M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP13M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP14M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '97%', out.height = '97%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP15M.JPG")
+```
+
+---
+
+.purple[.font3[**Temporal hierarchical structure**]]
+
+```{r figurechapter0005V2, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '100%', out.height = '80%',fig.height=7, fig.width=14}
+TEM
+```
+
+---
+
+```{r ,echo=FALSE}
+library(tsfeatures)
+Temporal_DengueFeatures<-tsfeatures(aggts_total)
+pr1<-prcomp(Temporal_DengueFeatures[,-c(1,10,11,12,20)],scale=TRUE)
+as.data.frame(pr1$rotation)
+```
+
+---
+
+.purple[.font3[**Principal Component Analysis**]]
+
+```{r ,echo=FALSE,warning=FALSE,message=FALSE, out.width = '97%', out.height = '97%',fig.height=8, fig.width=16}
+fviz_eig(pr1)
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP16M.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP17.JPG")
+```
+
+---
+
+.purple[.font3[**Change point analysis**]]
+
+.font2[
+ * Change point detection is the process of identifying the time point, in which properties of data suddenly change.]
+
+
+```{r ,echo=FALSE, out.width = '82%', out.height = '62%',fig.height=4, fig.width=14,fig.align='center'}
+knitr::include_graphics("images/CPT.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP18.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP19.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP20.JPG")
+```
+
+---
+
+```{r ,echo=FALSE, out.width = '100%', out.height = '100%',fig.height=9, fig.width=16}
+knitr::include_graphics("images/PP21.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW4.JPG")
+```
+
+---
+
+.purple[.font3[**Hierarchical forecasting workflow**]]
+
+.font2[
+* All series at all levels of the hierarchical structure individually forecast based on **Mean, NAIVE, SNAIVE, ETS, and ARIMA methods**.
+
+* These are referred to as **base forecasts**.]
+<br><br>
+--
+
+```{r , echo=FALSE, fig.align = 'center',message=FALSE}
+knitr::include_graphics("images/AUTOver1.JPG")
+```
+
+---
+
+.purple[.font3[**Coherence of data**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/DATAcoh1.JPG")
+```
+
+---
+
+.purple[.font3[**Coherence of data**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/DATAcohVZ2.JPG")
+```
+
+---
+
+.purple[.font2[**Base forecasting approaches**]]
+
+.font2[
+.purple[**Mean method**]
+
+* Forecasts of all future values are equal to the average of the historical data.
+
+* If historical data are $y_{1}, y_{2},\dots, y_{T}$, then] 
+
+$$\hat{y}_{T+h|T}=\frac{y_{1}+y_{2}+\dots + y_{T}}{T}$$
+
+.font2[.purple[**NAIVE method**]
+
+* All forecasts are equal to the value of the last observation.]
+
+
+$$\hat{y}_{T+h|T}=y_{T}$$
+---
+
+.font2[.purple[**SNAIVE method**]
+
+* Forecast to be equal to the last observed value from the same season of the year.
+
+* If historical data are $y_{1}, y_{2},\dots, y_{T}$, then]  
+
+$$\hat{y}_{T+h|T}=y_{T+h-m(k+1)}$$
+.font2[
+* $m=$ seasonal period
+* $k=$ number of completed years in the forecast period prior to time $T+h$.]  
+
+---
+
+.font2[
+.purple[**Exponential Smoothing (ETS) models**]
+
+* Forecasts are produced based on weighted averages of the past observations.]
+
+$$\hat{y}_{T+1|T}=\alpha y_{T}+(1-\alpha)\hat{y}_{T}$$
+$$\hat{y}_{T+1|T} \hspace{0.05in} \approx \hspace{0.05in}\alpha y_{T}+\alpha (1-\alpha)y_{T-1}+\alpha (1-\alpha)^{2}y_{T-2}+\alpha (1-\alpha)^{3}y_{T-3}+\dots$$
+
+.font2[
+.purple[**AutoRegressive Integrated Moving Average (ARIMA) models**]
+
+* ARIMA models aim to describe the autocorrelations in the data.]
+
+---
+.font2[
+.purple[**Autoregressive models**]
+
+
+Autoregressive models consist the variable of interest using a linear combination of past values of the variable.]
+
+$$y_{t}=\phi_{0}+\phi_{1}y_{t-1}+\phi_{2}y_{t-2}+\dots+\phi_{p}y_{t-p}+\epsilon_{t}$$
+.font2[
+.purple[**Moving average models**]
+
+In moving average models, current variable of interest is a linear combination of past forecast errors and current error.]
+
+$$y_{t}=\phi_{0}+\theta_{1}\epsilon_{t-1}+\theta_{2}\epsilon_{t-2}+\dots+\theta_{q}\epsilon_{t-q}+\epsilon_{t}$$
+
+---
+
+.font3[.purple[**Base Forecasting Approaches**]]
+<br><br><br><br>
+.font2[.purple[**Spatial Hierarchical Structure**]]
+
+<br>
+
+```{r ,echo=FALSE, out.width = '95%', out.height = '90%',fig.height=6, fig.width=16}
+knitr::include_graphics("images/SpaCoh.JPG")
+```
+
+---
+
+.font3[.purple[**Base Forecasting Approaches**]]
+<br><br><br><br>
+.font2[.purple[**Spatial Hierarchical Structure**]]
+
+<br>
+
+```{r ,echo=FALSE, out.width = '95%', out.height = '90%',fig.height=6, fig.width=16}
+knitr::include_graphics("images/SpaCoh1.JPG")
+```
+
+---
+
+.font3[.purple[**Base Forecasting Approaches**]]
+<br><br><br><br>
+.font2[.purple[**Temporal Hierarchical Structure**]]
+
+<br>
+
+```{r ,echo=FALSE, out.width = '95%', out.height = '90%',fig.height=6, fig.width=16}
+knitr::include_graphics("images/TemCoh.JPG")
+```
+
+---
+
+.font3[.purple[**Base Forecasting Approaches**]]
+<br><br><br><br>
+.font2[.purple[**Temporal Hierarchical Structure**]]
+
+<br>
+
+```{r ,echo=FALSE, out.width = '95%', out.height = '90%',fig.height=6, fig.width=16}
+knitr::include_graphics("images/TemCoh1.JPG")
+```
+
+---
+
+.font3[.purple[**Forecast Reconciliation**]]
+
+.font2[ $h$ step ahead reconciled forecasts at time $t: \hspace{0.1in} \tilde{y}_{t}{(h)}$ 
+<br>
+$h$ step ahead base forecasts at time $t: \hspace{0.1in} \hat{y}_{t}{(h)}$] 
+
+```{r , echo=FALSE, fig.align = 'center',message=FALSE, out.width = '40%', out.height = '40%'}
+knitr::include_graphics("images/AUTO2.JPG")
+```
+
+.font2[
+ * Role of $G$ is different from approach to approach.]
+
+---
+
+.font3[.purple[**Top down approach**]]
+
+```{r , echo=FALSE, fig.align = 'center',message=FALSE, out.width = '50%', out.height = '50%'}
+knitr::include_graphics("images/TD.JPG")
+```
+
+$$
+G=
+\begin{pmatrix}
+p_{1} & 0 & 0 & 0 & 0 & 0 & 0\\
+p_{2} & 0 & 0 & 0 & 0 & 0 & 0\\
+p_{3} & 0 & 0 & 0 & 0 & 0 & 0\\
+p_{4} & 0 & 0 & 0 & 0 & 0 & 0
+\end{pmatrix}
+$$
+---
+
+.font3[.purple[**Bottom up approach**]]
+
+```{r , echo=FALSE, fig.align = 'center',message=FALSE, out.width = '50%', out.height = '50%'}
+knitr::include_graphics("images/BU.JPG")
+```
+
+$$
+G=
+\begin{pmatrix}
+0 & 0 & 0 & 1 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 1 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 1 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 1
+\end{pmatrix}
+$$
+
+---
+
+.font3[.purple[**Trace minimization approach (MinT)**]]
+
+$$G=(S^{'}W_{h}^{-1}S)^{-1} S^{'}W_{h}^{-1}$$
+
+.font2[
+ * Error variance of base forecasts: $Var(y_{t+h}- \hat{y}_{t}(h))=W_{h}$]
+
+.font3[.purple[Alternatives]]
+
+.font2[
+ * Ordinary least square estimator]
+
+##### $$W_{h}=k_{h}I$$
+
+.font2[
+ * Weighted least square estimator using structure of hierarchy]
+
+##### $$W_{h}=k_{h} \Lambda$$
+
+.font2[
+ * Weighted least square estimator using shrinkage estimator]
+
+##### $$W_{h}=k_{h} \hat{W}_{1,D}^{*}$$
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW5.JPG")
+```
+
+---
+
+.font3[.purple[**Forecast accuracy**]]
+
+.font2[
+  * Performance of a forecast model is evaluated base on forecast accuracy.]
+
+.font3[.purple[**Mean Absolute Scale Error (MASE)**]]
+
+.font2[
+  * Error is the difference between observed value and forecast] $(e_{T+h}=y_{T+h}-\hat{y}_{T+h|T})$.
+
+$$MASE=mean(|q_{j}|)$$
+where $$q_{j}=\frac{e_{j}}{\sum_{t=m+1}^{T}\frac{|y_{t}-y_{t-m}|}{T-m}}$$
+
+---
+
+.font3[.purple[**Spatial hierarchical forecasting**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/SETS.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/TABLE1.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/TABLE2.JPG")
+```
+
+---
+
+.font3[.purple[**The best forecasting approaches in provinces**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/Plevel1.JPG")
+```
+
+---
+
+.font3[.purple[**The best forecasting approaches in districts**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="85%",out.width="98%"}
+knitr::include_graphics("images/Dlevel.JPG")
+```
+
+---
+
+.font3[.purple[**Temporal hierarchical structure**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/TEM.JPG")
+```
+
+---
+
+.font3[.purple[**The best forecasting approaches for temporal granualities**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/TEMAGGRESULTS.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW6.JPG")
+```
+
+---
+
+class: bg-main1 center middle
+
+```{r echo=FALSE,warning=FALSE,message=FALSE}
+library(icons)
+library(anicon)
+anicon::faa("rocket", animate="passing", size = 3)
+
+```
+
+.font5[**Visualization of model performance**] 
+
+---
+
+.font3[.purple[**Visualization of model performance**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/MPVReason1.JPG")
+```
+
+---
+
+.font3[.purple[**Visualization of model performance**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/MPVReason2.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+
+knitr::include_graphics("images/FLOW7.JPG")
+```
+
+---
+
+.font3[.purple[**Dissemination of Research Output**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/APP1.JPG")
+```
+
+---
+
+.font3[.purple[**Dissemination of Research Output**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/APP2.JPG")
+```
+
+---
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/APP1RESULT.JPG")
+```
+
+---
+
+class: bg-main1 
+.font3[Conclusion]
+
+.font2[
+
+* Forecasts generated by the hierarchical forecasting approach are extremely important to obtain aligned decisions across the entire hierarchical structure. However, the best forecasting approach varies according to the features associated with time series.
+
+* Feature-based visualization assists to identify the pattern variations of the series in the spatial hierarchical structure.]
+
+---
+
+class: bg-main1 
+.font3[Future directions]
+
+.font2[
+* Nowcasting approaches can be used to fix data issues.
+
+* The cross-temporal hierarchical forecasting approach can be considered in the future.
+
+* The effect of other exogenous factors such as climate, demographic, and entomological variables can be included in the forecasting models.]
+
+---
+class: bg-main1 
+
+.font2[References]
+.font2[
+* Hyndman, RJ & Athanasopoulos, G 2018, Forecasting: Principles and practice, OTexts.
+
+* Killick, R & Eckley, I 2014, ‘Changepoint: An r package for changepoint analysis,’ Journal of statistical software, vol. 58, no. 3, pp. 1–19.
+
+* Montero-Manso, P., Athanasopoulos, G., Hyndman, R.J. and Talagala, T.S., 2020. FFORMA: Feature-based forecast model averaging. International Journal of Forecasting, 36(1), pp.86-92.
+
+* Panagiotelis, A, Athanasopoulos, G, Gamakumara, P & Hyndman, RJ 2021, ‘Forecast reconciliation: A geometric view with new insights on bias correction,’ International Journal of Forecasting, vol. 37, no. 1, pp. 343–359.]
+
+---
+
+class: bg-main1 
+
+.center[.font5[Thank you!]]
+
+.center[![scale 5%](images\F8M.JPG)]
+
+.font2[Forecasting App available :<br>
+ 
+ https://samudramadushani.shinyapps.io/DengueAPPversion1 <br>
+ https://samudramadushani.shinyapps.io/DengueAPPversion2]
+ 
+### `r anicon::faa("github", animate="vertical")` : SamudraMadushani <br>
+
+### `r anicon::faa("twitter", animate="float")` : @Samudramadu
+
+---
