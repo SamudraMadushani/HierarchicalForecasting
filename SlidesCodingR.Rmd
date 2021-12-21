@@ -1118,9 +1118,11 @@ class: bg-main1
 
 class: bg-main1 
 
-.center[.font5[Thank you!]]
+.center[.font4[Thank you!]]
 
-.center[![scale 5%](images\F8M.JPG)]
+.center[![scale 3%](images\F8M.JPG)]
+
+.font2[Madushani, L.S. and Talagala, T.S., 2021. Hierarchical Forecasting of Dengue Incidence in Sri Lanka. arXiv preprint arXiv:2112.00992.]
 
 .font2[Forecasting App available :<br>
  
