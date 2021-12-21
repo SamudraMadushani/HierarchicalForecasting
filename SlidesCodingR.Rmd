@@ -73,13 +73,18 @@ class: bg-main1
 .font2[
   .yellow[ **Specific objectives**]
 
-* Introduce a novel feature-based visualization approach to identify patterns associated with time series of spatio-temporal structure. 
+* Introduce a novel feature-based visualization approach to identify patterns associated with time series of spatio-temporal structure.] 
+--
+.font2[
 
-* Develop an R software package to automate the process of extracting data from weekly epidemiological PDF reports.
+ * Develop an R software package to automate the process of extracting data from weekly epidemiological PDF reports.]
+ 
+--
+.font2[
 
 * Identify the reasons for forecasting model performance variations.
 
-* Develop a shiny app to disseminate the research output.
+* Develop a shiny app to disseminate the research output.]
 
 ]
 
