@@ -1121,11 +1121,9 @@ class: bg-main1
 .center[.font4[Thank you!]]
 
 .center[![scale 3%](images\F8M.JPG)]
-
 .font2[Madushani, L.S. and Talagala, T.S., 2021. Hierarchical Forecasting of Dengue Incidence in Sri Lanka. arXiv preprint arXiv:2112.00992.]
 
 .font2[Forecasting App available :<br>
- 
  https://samudramadushani.shinyapps.io/DengueAPPversion1 <br>
  https://samudramadushani.shinyapps.io/DengueAPPversion2]
  
