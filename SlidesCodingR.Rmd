@@ -649,6 +649,14 @@ knitr::include_graphics("images/PP15M.JPG")
 
 ---
 
+.font3[.purple[**Temporal hierarchical structure**]]
+
+```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
+knitr::include_graphics("images/TEM.JPG")
+```
+
+---
+
 .purple[.font3[**Temporal hierarchical structure**]]
 
 ```{r figurechapter0005V2, echo=FALSE, fig.align = 'center',message=FALSE, out.width = '100%', out.height = '80%',fig.height=7, fig.width=14}
@@ -1000,14 +1008,6 @@ knitr::include_graphics("images/Plevel1.JPG")
 
 ```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="85%",out.width="98%"}
 knitr::include_graphics("images/Dlevel.JPG")
-```
-
----
-
-.font3[.purple[**Temporal hierarchical structure**]]
-
-```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
-knitr::include_graphics("images/TEM.JPG")
 ```
 
 ---
