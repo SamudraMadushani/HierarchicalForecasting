@@ -893,6 +893,20 @@ knitr::include_graphics("images/AUTO2.JPG")
 
 ---
 
+.font3[.purple[**Hierarchical Forecasting approaches**]]
+
+.font2[
+<br>
+ * Top down approach
+ <br><br>
+ * Bottom up approach
+ <br><br>
+ * Middle out approach
+ 
+]
+
+---
+
 .font3[.purple[**Top down approach**]]
 
 ```{r , echo=FALSE, fig.align = 'center',message=FALSE, out.width = '50%', out.height = '50%'}
@@ -1036,7 +1050,7 @@ anicon::faa("rocket", animate="passing", size = 3)
 
 ```
 
-.font5[**Visualization of model performance**] 
+.font5[**Visualization of Model-based Results**] 
 
 ---
 
