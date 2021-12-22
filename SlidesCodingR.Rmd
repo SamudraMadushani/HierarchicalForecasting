@@ -990,7 +990,7 @@ where $$q_{j}=\frac{e_{j}}{\sum_{t=m+1}^{T}\frac{|y_{t}-y_{t-m}|}{T-m}}$$
 
 ---
 
-.font3[.purple[**Spatial hierarchical forecasting**]]
+.font3[.purple[**Spatial/ temporal hierarchical forecasting**]]
 
 ```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
 knitr::include_graphics("images/SETS.JPG")
@@ -1054,7 +1054,7 @@ anicon::faa("rocket", animate="passing", size = 3)
 
 ---
 
-.font3[.purple[**Visualization of model performance**]]
+.font3[.purple[**Visualization of model-based results**]]
 
 ```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
 knitr::include_graphics("images/MPVReason1.JPG")
@@ -1062,7 +1062,7 @@ knitr::include_graphics("images/MPVReason1.JPG")
 
 ---
 
-.font3[.purple[**Visualization of model performance**]]
+.font3[.purple[**Visualization of model-based results**]]
 
 ```{r ,echo=FALSE,fig.height=9, fig.width=16, out.height="97%",out.width="97%"}
 knitr::include_graphics("images/MPVReason2.JPG")
